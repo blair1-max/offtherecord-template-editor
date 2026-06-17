@@ -6,10 +6,10 @@
 <title>영상 템플릿 편집기</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#f0f0f0;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:#141414;color:#f0f0f0;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 
 /* Header */
-.hdr{display:flex;align-items:center;gap:12px;padding:13px 20px;border-bottom:1px solid #1e1e1e;background:#0d0d0d;flex-shrink:0}
+.hdr{display:flex;align-items:center;gap:12px;padding:13px 20px;border-bottom:1px solid #1e1e1e;background:#171717;flex-shrink:0}
 .hdr-ico{width:28px;height:28px;border:1.5px solid #333;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#aaa}
 .hdr-t{font-size:13px;font-weight:600}
 .hdr-s{font-size:10px;color:#999;margin-top:2px;letter-spacing:.1em;text-transform:uppercase}
@@ -18,12 +18,38 @@ body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:#0a0a0a;co
 .wrap{display:flex;flex:1;min-height:0;overflow:hidden}
 
 /* Left panel */
-.lp{width:580px;flex-shrink:0;border-right:1px solid #181818;display:flex;flex-direction:column;overflow-y:auto;background:#0c0c0c}
+.lp{width:580px;flex-shrink:0;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;overflow-y:auto;background:#161616}
 .lp::-webkit-scrollbar{width:3px}
 .lp::-webkit-scrollbar-thumb{background:#222;border-radius:2px}
 
 .sec{border-bottom:1px solid #181818;padding:22px 18px}
-.sec-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#aaa;margin-bottom:14px}
+.sec-lbl{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#ddd;margin-bottom:14px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.sec-note{font-size:10px;font-weight:400;letter-spacing:0;text-transform:none;color:#888}
+
+/* 편집 툴바 (실행취소 / 초기화) */
+.edit-toolbar{display:flex;gap:8px;padding:12px 18px;border-bottom:1px solid #222;background:#1c1c1c;position:sticky;top:0;z-index:50}
+.etb-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#222;border:1px solid #333;border-radius:6px;color:#ccc;font-size:11px;font-weight:600;padding:8px 10px;cursor:pointer;transition:all .15s;font-family:inherit}
+.etb-btn:hover:not(:disabled){background:#2c2c2c;border-color:#444;color:#fff}
+.etb-btn:disabled{opacity:.35;cursor:not-allowed}
+.etb-btn .etb-ico{font-size:13px;line-height:1}
+.etb-btn.reset:hover:not(:disabled){border-color:#8a3a3a;color:#ffb0b0}
+
+/* 1번 슬롯 가이드 툴팁 */
+.pslot.has-guide{position:relative}
+.pslot.has-guide:hover{overflow:visible}
+.slot-tip{
+  position:absolute;bottom:calc(100% + 8px);left:0;transform:translateY(4px);
+  width:200px;background:#23262c;border:1px solid #363a42;border-radius:7px;
+  padding:9px 11px;font-size:11px;line-height:1.55;color:#cfd3da;
+  box-shadow:0 6px 20px rgba(0,0,0,.55);
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s,transform .15s;z-index:200;
+}
+.slot-tip b{color:#fff;font-weight:600}
+.slot-tip::after{
+  content:"";position:absolute;top:100%;left:24px;
+  border:6px solid transparent;border-top-color:#23262c;
+}
+.pslot.has-guide:hover .slot-tip{opacity:1;visibility:visible;transform:translateY(0)}
 
 /* Color rows */
 .crow{display:flex;align-items:center;gap:10px;margin-bottom:16px}
@@ -86,10 +112,10 @@ body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:#0a0a0a;co
 }
 .brand-area.has-img:hover::after{background:rgba(0,0,0,.45);}
 .brand-area .phdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.plbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#aaa}
+.plbl{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#ddd}
 .pcnt{font-size:10px;color:#999;font-family:'SF Mono',monospace}
 .pslots{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:12px}
-.pslot{aspect-ratio:3/4;border:1.5px dashed #252525;border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:#090909;transition:border-color .15s,background .15s}
+.pslot{aspect-ratio:3/4;border:1.5px dashed #252525;border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:#131313;transition:border-color .15s,background .15s}
 .pslot:hover,.pslot.drag-over{border-color:#888;background:#111}
 .pslot.selected{border-color:#fff!important;border-style:solid!important;}
 /* 딤드 슬라이더 패널 */
@@ -106,7 +132,7 @@ body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:#0a0a0a;co
 .slot-dim-inner{display:flex;align-items:center;gap:10px;}
 .slot-dim-lbl{font-size:11px;color:#d8d8d8;flex-shrink:0;}
 .slot-dim-sublbl{font-size:10px;color:#888;flex-shrink:0;margin-right:4px;}
-.slot-dim-hint{font-size:10px;color:#3a3a3a;margin-bottom:8px;visibility:visible;}
+.slot-dim-hint{font-size:10px;color:#777;margin-bottom:8px;visibility:visible;}
 .slot-dim-val{font-size:10px;color:#999;font-family:'SF Mono',monospace;min-width:30px;text-align:right;flex-shrink:0;}
 .slot-dim-close{font-size:11px;color:#888;cursor:pointer;margin-left:6px;flex-shrink:0;}
 .slot-dim-close:hover{color:#ccc;}
@@ -114,7 +140,7 @@ body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:#0a0a0a;co
 .pslot .sn{font-size:10px;color:#777;font-family:'SF Mono',monospace;pointer-events:none}
 .pslot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
 .logo-hist{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.lthumb{width:60px;height:38px;border-radius:4px;border:1.5px solid #1e1e1e;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#0d0d0d;transition:border-color .15s;padding:3px;position:relative;}
+.lthumb{width:60px;height:38px;border-radius:4px;border:1.5px solid #1e1e1e;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#171717;transition:border-color .15s;padding:3px;position:relative;}
 .lthumb:hover,.lthumb.active{border-color:#ececec}
 .lthumb img{max-width:100%;max-height:100%;object-fit:contain}
 .lthumb::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .15s;pointer-events:none;}
@@ -162,9 +188,9 @@ body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:#0a0a0a;co
 .tl::before{content:'—';position:absolute;left:0;color:#3a3a3a}
 
 /* Center */
-.cp{flex:1;display:flex;flex-direction:column;align-items:center;padding:18px 20px 14px;background:#060606;min-width:0;overflow-y:auto}
+.cp{flex:1;display:flex;flex-direction:column;align-items:center;padding:18px 20px 14px;background:#161616;min-width:0;overflow-y:auto}
 .ptag{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#777;margin-bottom:12px;align-self:flex-start}
-.pframe{background:#000;border-radius:4px;overflow:hidden;border:1px solid #1a1a1a;flex-shrink:0}
+.pframe{background:#000;border-radius:4px;overflow:hidden;border:1px solid #333;flex-shrink:0}
 #c{display:block}
 
 .ctrl{width:100%;max-width:384px;margin-top:12px}
@@ -185,14 +211,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
 .etxt{font-size:9px;color:#3a3a3a;text-align:center;margin-top:6px}
 
 /* Right */
-.rp{width:180px;flex-shrink:0;border-left:1px solid #181818;padding:14px 12px;overflow-y:auto;background:#0c0c0c}
+.rp{width:180px;flex-shrink:0;border-left:1px solid #2a2a2a;padding:14px 12px;overflow-y:auto;background:#161616}
 .rp::-webkit-scrollbar{width:3px}
 .rp::-webkit-scrollbar-thumb{background:#222;border-radius:2px}
 .rhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .rlabel{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999}
 .rclr{font-size:9px;color:#777;cursor:pointer}
 .rclr:hover{color:#cfcfcf}
-.hitem{border:1px solid #181818;border-radius:4px;overflow:hidden;margin-bottom:7px;cursor:pointer;transition:border-color .15s;background:#0a0a0a}
+.hitem{border:1px solid #181818;border-radius:4px;overflow:hidden;margin-bottom:7px;cursor:pointer;transition:border-color .15s;background:#141414}
 .hitem:hover{border-color:#2a2a2a}
 .hthumb{width:100%;aspect-ratio:9/16;background:#111;overflow:hidden}
 .hthumb img{width:100%;height:100%;object-fit:cover;display:block}
@@ -211,9 +237,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
   <!-- Left -->
   <div class="lp">
 
+    <!-- 편집 툴바 -->
+    <div class="edit-toolbar">
+      <button class="etb-btn" id="undoBtn" disabled><span class="etb-ico">↶</span>실행 취소</button>
+      <button class="etb-btn reset" id="resetBtn"><span class="etb-ico">⟲</span>전체 초기화</button>
+    </div>
+
     <!-- Color -->
     <div class="sec">
-      <div class="sec-lbl">컬러 설정</div>
+      <div class="sec-lbl">컬러 설정 <span class="sec-note">라인 컬러 변경 시 블러 컬러가 자동 설정됩니다</span></div>
       <div class="crow">
         <span class="clbl">라인 컬러</span>
         <div class="csw" id="lineSwatch" style="background:#ffffff" tabindex="0" role="button" aria-label="라인 컬러 선택">
@@ -228,14 +260,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
         </div>
         <input class="chex" type="text" id="blurHex" value="#ffffff" maxlength="7">
       </div>
-      <div class="chint">라인 컬러 변경 시 블러 컬러가 자동 설정됩니다</div>
     </div>
 
 
 
     <!-- Brand Logo -->
     <div class="sec">
-      <div class="sec-lbl">브랜드 로고</div>
+      <div class="sec-lbl">브랜드 로고 <span class="sec-note">흰색 PNG 로고 파일을 업로드해주세요</span></div>
       <div class="brand-area" id="brandArea">
         <div class="ba-icon">⬆</div>
         <div class="ba-txt">클릭 또는 드래그&amp;드롭으로 업로드</div>
@@ -243,15 +274,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
         <img id="brandImg" alt="" style="display:none;">
         <div class="del-btn" id="brandDel">✕</div>
       </div>
-      <div class="ctrl-row" style="margin-top:10px">
-        <span class="ctrl-lbl">로고 크기</span>
-        <input type="range" class="ctrl-slider" id="brandScale" min="20" max="200" value="100" step="1">
-        <span class="ctrl-val" id="brandScaleVal">100%</span>
-      </div>
-      <div class="ctrl-row">
-        <span class="ctrl-lbl">위치 (상하)</span>
-        <input type="range" class="ctrl-slider" id="brandPosY" min="-400" max="400" value="0" step="1">
-        <span class="ctrl-val" id="brandPosYVal">0</span>
+      <div class="slot-dim-panel" style="margin-top:12px">
+        <div class="slot-dim-inner">
+          <span class="slot-dim-sublbl" style="width:52px;margin-right:0">크기</span>
+          <input type="range" class="ctrl-slider" id="brandScale" min="20" max="200" value="100" step="1" style="flex:1">
+          <span class="slot-dim-val" id="brandScaleVal">100%</span>
+        </div>
+        <div class="slot-dim-inner" style="margin-top:8px">
+          <span class="slot-dim-sublbl" style="width:52px;margin-right:0">위치(상하)</span>
+          <input type="range" class="ctrl-slider" id="brandPosY" min="-400" max="400" value="0" step="1" style="flex:1">
+          <span class="slot-dim-val" id="brandPosYVal">0</span>
+        </div>
       </div>
       <div class="logo-hist" id="logoHist"></div>
     </div>
@@ -264,14 +297,33 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
       </div>
       <div class="pslots" id="photoSlots"></div>
       <div class="slot-dim-panel" id="slotDimPanel">
-        <div class="slot-dim-hint" id="slotDimHint">사진을 클릭하면 딤드를 조절할 수 있어요</div>
+        <div class="slot-dim-hint" id="slotDimHint">사진을 클릭하면 위치·크기·딤드를 조절할 수 있어요</div>
         <div class="slot-dim-inner">
           <span class="slot-dim-lbl">사진 <span id="slotDimIdx">—</span></span>
+          <span class="slot-dim-sublbl">크기</span>
+          <input type="range" class="ctrl-slider" id="slotScaleSlider" min="100" max="300" value="100" step="1" style="flex:1">
+          <span class="slot-dim-val" id="slotScaleVal">—</span>
+        </div>
+        <div class="slot-dim-inner" style="margin-top:8px">
+          <span class="slot-dim-lbl" style="visibility:hidden">사진 —</span>
+          <span class="slot-dim-sublbl">좌우</span>
+          <input type="range" class="ctrl-slider" id="slotPosXSlider" min="-100" max="100" value="0" step="1" style="flex:1">
+          <span class="slot-dim-val" id="slotPosXVal">—</span>
+        </div>
+        <div class="slot-dim-inner" style="margin-top:8px">
+          <span class="slot-dim-lbl" style="visibility:hidden">사진 —</span>
+          <span class="slot-dim-sublbl">상하</span>
+          <input type="range" class="ctrl-slider" id="slotPosYSlider" min="-100" max="100" value="0" step="1" style="flex:1">
+          <span class="slot-dim-val" id="slotPosYVal">—</span>
+        </div>
+        <div class="slot-dim-inner" style="margin-top:8px">
+          <span class="slot-dim-lbl" style="visibility:hidden">사진 —</span>
+          <span class="slot-dim-sublbl">딤드</span>
           <input type="range" class="ctrl-slider" id="slotDimSlider" min="0" max="100" value="0" step="1" style="flex:1">
           <span class="slot-dim-val" id="slotDimVal">—</span>
         </div>
       </div>
-      <div class="rlbl">최근 사용 이미지 <span style="color:#3a3a3a">(클릭 → 빈 슬롯 배치)</span></div>
+      <div class="rlbl">최근 사용 이미지 <span style="color:#777">(클릭 → 빈 슬롯 배치)</span></div>
       <div class="rrow" id="recentRow"></div>
     </div>
 
@@ -350,6 +402,9 @@ let lineColor='#ffffff', blurColor='#ffffff';
 /* ─── dimmed settings ─── */
 const dimTopH=300, dimBotH=350;                         // 고정 높이 (px)
 const userPhotoDimA=new Array(6).fill(0);               // 슬롯별 딤드 alpha (0~1)
+const userPhotoScale=new Array(6).fill(1);              // 슬롯별 크기 배율 (1.0 = 원본)
+const userPhotoOffX=new Array(6).fill(0);              // 슬롯별 좌우 위치 (-1~1, crop 기준 비율)
+const userPhotoOffY=new Array(6).fill(0);              // 슬롯별 상하 위치 (-1~1, crop 기준 비율)
 
 /* ─── brand scale (0~2.0, default 1.0) ─── */
 let brandScaleFactor=1.0;
@@ -546,6 +601,19 @@ function buildStrip(){
     let sx=0,sy=0,sw=img.naturalWidth,sh=img.naturalHeight;
     if(ar>car){sw=sh*car;sx=(img.naturalWidth-sw)/2;}
     else{sh=sw/car;sy=(img.naturalHeight-sh)/2;}
+    /* 사진별 크기(줌) 적용: scale이 클수록 crop 영역을 줄여 확대 */
+    const sc_=userPhotoScale[i]||1;
+    if(sc_!==1){
+      const nsw=sw/sc_, nsh=sh/sc_;
+      sx+=(sw-nsw)/2; sy+=(sh-nsh)/2;
+      sw=nsw; sh=nsh;
+    }
+    /* 사진별 위치(좌우/상하) 적용: 남는 여백 범위 안에서 crop 영역 이동 */
+    const offX=userPhotoOffX[i]||0, offY=userPhotoOffY[i]||0;
+    const freeX=Math.max(0, img.naturalWidth-sw);
+    const freeY=Math.max(0, img.naturalHeight-sh);
+    sx=Math.max(0,Math.min(img.naturalWidth-sw,  sx+offX*(freeX/2)));
+    sy=Math.max(0,Math.min(img.naturalHeight-sh, sy+offY*(freeY/2)));
     sctx.drawImage(img,sx,sy,sw,sh,cx,0,cw,ch);
 
   });
@@ -582,12 +650,25 @@ function buildSlots(){
     const num=document.createElement('span');num.className='sn';num.textContent=i+1;
     slot.appendChild(num);
 
+    /* 1번 슬롯 가이드 툴팁 */
+    if(i===0){
+      slot.classList.add('has-guide');
+      const tip=document.createElement('div');
+      tip.className='slot-tip';
+      tip.innerHTML='<b>1번 사진 안내</b><br>영상 시작 시 텍스트가 사진 위에 올라가요. 비교적 톤이 어두운 사진을 선택해주세요.';
+      slot.appendChild(tip);
+    }
+
     /* delete btn */
     const del=document.createElement('div');del.className='del-btn';del.textContent='✕';
     del.addEventListener('click',e=>{
       e.stopPropagation();
+      pushUndo();
       userPhotos[i]=null;
       userPhotoDimA[i]=0;
+      userPhotoScale[i]=1;
+      userPhotoOffX[i]=0;
+      userPhotoOffY[i]=0;
       slot.classList.remove('has-img');
       const img=slot.querySelector('img');if(img)img.remove();
       num.style.display='';
@@ -625,7 +706,11 @@ function loadPhotoToSlot(idx,file){
   readFileAsImage(file,(img,url)=>setPhotoInSlot(idx,img,url));
 }
 function setPhotoInSlot(idx,img,url){
+  pushUndo();
   userPhotos[idx]=img;
+  userPhotoScale[idx]=1;
+  userPhotoOffX[idx]=0;
+  userPhotoOffY[idx]=0;
   const slot=document.querySelectorAll('.pslot')[idx];
   let thumb=slot.querySelector('img');
   if(!thumb){thumb=document.createElement('img');slot.insertBefore(thumb,slot.querySelector('.del-btn'));}
@@ -660,6 +745,7 @@ const brandArea=document.getElementById('brandArea');
 const logoHistory=[];
 
 function setBrandImg(img,url){
+  pushUndo();
   userBrandImg=img;
   const el=document.getElementById('brandImg');
   el.src=url;el.style.display='block';
@@ -678,6 +764,7 @@ function setBrandImg(img,url){
 /* brand delete button */
 document.getElementById('brandDel').addEventListener('click',e=>{
   e.stopPropagation();
+  pushUndo();
   userBrandImg=null;
   const el=document.getElementById('brandImg');
   el.src='';el.style.display='none';
@@ -902,6 +989,7 @@ function initColorPicker(){
   /* ── open / close ── */
   function openPicker(target,anchorEl){
     activeTarget=target;
+    if(typeof pushUndo==='function')pushUndo(); // 색 변경 직전 상태 저장
     const currentHexVal=target==='line'
       ? document.getElementById('lineHex').value
       : document.getElementById('blurHex').value;
@@ -1067,13 +1155,19 @@ function addHistory(){
 }
 document.getElementById('histClear').addEventListener('click',()=>{document.getElementById('histList').innerHTML='';});
 
-/* ─── 사진 개별 딤드 패널 ─── */
+/* ─── 사진 개별 크기/딤드 패널 ─── */
 function openDimPanel(idx){
   activeSlot=idx;
   document.querySelectorAll('.pslot').forEach((s,i)=>s.classList.toggle('selected',i===idx));
   document.getElementById('slotDimIdx').textContent=idx+1;
   document.getElementById('slotDimSlider').value=Math.round(userPhotoDimA[idx]*100);
   document.getElementById('slotDimVal').textContent=Math.round(userPhotoDimA[idx]*100)+'%';
+  document.getElementById('slotScaleSlider').value=Math.round((userPhotoScale[idx]||1)*100);
+  document.getElementById('slotScaleVal').textContent=Math.round((userPhotoScale[idx]||1)*100)+'%';
+  document.getElementById('slotPosXSlider').value=Math.round((userPhotoOffX[idx]||0)*100);
+  document.getElementById('slotPosXVal').textContent=Math.round((userPhotoOffX[idx]||0)*100);
+  document.getElementById('slotPosYSlider').value=Math.round((userPhotoOffY[idx]||0)*100);
+  document.getElementById('slotPosYVal').textContent=Math.round((userPhotoOffY[idx]||0)*100);
 }
 function closeDimPanel(){
   activeSlot=-1;
@@ -1081,8 +1175,15 @@ function closeDimPanel(){
   document.getElementById('slotDimIdx').textContent='—';
   document.getElementById('slotDimVal').textContent='—';
   document.getElementById('slotDimSlider').value=0;
+  document.getElementById('slotScaleVal').textContent='—';
+  document.getElementById('slotScaleSlider').value=100;
+  document.getElementById('slotPosXVal').textContent='—';
+  document.getElementById('slotPosXSlider').value=0;
+  document.getElementById('slotPosYVal').textContent='—';
+  document.getElementById('slotPosYSlider').value=0;
 }
 
+document.getElementById('slotDimSlider').addEventListener('change',pushUndo);
 document.getElementById('slotDimSlider').addEventListener('input',function(){
   if(activeSlot<0)return;
   userPhotoDimA[activeSlot]=this.value/100;
@@ -1090,8 +1191,33 @@ document.getElementById('slotDimSlider').addEventListener('input',function(){
   draw(parseFloat(document.getElementById('scrub').value));
 });
 
+document.getElementById('slotScaleSlider').addEventListener('change',pushUndo);
+document.getElementById('slotScaleSlider').addEventListener('input',function(){
+  if(activeSlot<0)return;
+  userPhotoScale[activeSlot]=this.value/100;
+  document.getElementById('slotScaleVal').textContent=this.value+'%';
+  buildStrip();
+});
+
+document.getElementById('slotPosXSlider').addEventListener('change',pushUndo);
+document.getElementById('slotPosXSlider').addEventListener('input',function(){
+  if(activeSlot<0)return;
+  userPhotoOffX[activeSlot]=this.value/100;
+  document.getElementById('slotPosXVal').textContent=this.value;
+  buildStrip();
+});
+
+document.getElementById('slotPosYSlider').addEventListener('change',pushUndo);
+document.getElementById('slotPosYSlider').addEventListener('input',function(){
+  if(activeSlot<0)return;
+  userPhotoOffY[activeSlot]=this.value/100;
+  document.getElementById('slotPosYVal').textContent=this.value;
+  buildStrip();
+});
+
 
 /* ─── Brand scale slider ─── */
+document.getElementById('brandScale').addEventListener('change',pushUndo);
 document.getElementById('brandScale').addEventListener('input',function(){
   brandScaleFactor=this.value/100;
   document.getElementById('brandScaleVal').textContent=this.value+'%';
@@ -1099,11 +1225,132 @@ document.getElementById('brandScale').addEventListener('input',function(){
 });
 
 /* ─── Brand vertical position slider ─── */
+document.getElementById('brandPosY').addEventListener('change',pushUndo);
 document.getElementById('brandPosY').addEventListener('input',function(){
   brandOffsetY=parseFloat(this.value);
   document.getElementById('brandPosYVal').textContent=this.value;
   draw(parseFloat(document.getElementById('scrub').value));
 });
+
+/* ═══════════════ Undo / Reset 시스템 ═══════════════ */
+/* 현재 편집 상태 전체를 스냅샷으로 캡처 */
+function captureState(){
+  return {
+    lineColor, blurColor,
+    brandScaleFactor, brandOffsetY,
+    userBrandImg,
+    photos:[...userPhotos],
+    photoStrip:userPhotoStripEl,
+    dim:[...userPhotoDimA],
+    scale:[...userPhotoScale],
+    offX:[...userPhotoOffX],
+    offY:[...userPhotoOffY],
+  };
+}
+/* 스냅샷으로부터 상태 복원 */
+function restoreState(s){
+  applyLineColor(s.lineColor);
+  applyBlurColor(s.blurColor);
+  brandScaleFactor=s.brandScaleFactor;
+  brandOffsetY=s.brandOffsetY;
+  document.getElementById('brandScale').value=Math.round(brandScaleFactor*100);
+  document.getElementById('brandScaleVal').textContent=Math.round(brandScaleFactor*100)+'%';
+  document.getElementById('brandPosY').value=brandOffsetY;
+  document.getElementById('brandPosYVal').textContent=brandOffsetY;
+  // 브랜드 로고
+  userBrandImg=s.userBrandImg;
+  const bImg=document.getElementById('brandImg');
+  const bArea=document.getElementById('brandArea');
+  if(userBrandImg){
+    bImg.src=userBrandImg.src; bImg.style.display='block';
+    bArea.classList.add('has-img');
+  } else {
+    bImg.removeAttribute('src'); bImg.style.display='none';
+    bArea.classList.remove('has-img');
+  }
+  // 사진들
+  for(let i=0;i<6;i++){
+    userPhotos[i]=s.photos[i];
+    userPhotoDimA[i]=s.dim[i];
+    userPhotoScale[i]=s.scale[i];
+    userPhotoOffX[i]=s.offX?s.offX[i]:0;
+    userPhotoOffY[i]=s.offY?s.offY[i]:0;
+    const slot=document.querySelector('.pslot[data-idx="'+i+'"]');
+    if(!slot)continue;
+    let thumb=slot.querySelector('img');
+    if(s.photos[i]){
+      if(!thumb){thumb=document.createElement('img');slot.appendChild(thumb);}
+      thumb.src=s.photos[i].src;
+      slot.classList.add('has-img');
+    } else {
+      if(thumb)thumb.remove();
+      slot.classList.remove('has-img');
+    }
+  }
+  userPhotoStripEl=s.photoStrip;
+  document.getElementById('photoCount').textContent=userPhotos.filter(Boolean).length;
+  closeDimPanel();
+  draw(parseFloat(document.getElementById('scrub').value));
+}
+
+let undoStack=[];
+const UNDO_LIMIT=50;
+
+function pushUndo(){
+  undoStack.push(captureState());
+  if(undoStack.length>UNDO_LIMIT)undoStack.shift();
+  updateUndoBtn();
+}
+function updateUndoBtn(){
+  document.getElementById('undoBtn').disabled=undoStack.length===0;
+}
+function doUndo(){
+  if(undoStack.length===0)return;
+  const prev=undoStack.pop();
+  restoreState(prev);
+  updateUndoBtn();
+}
+function doReset(){
+  if(!confirm('모든 편집 내용을 초기 상태로 되돌릴까요?'))return;
+  // 완전 초기화: 사진/로고/컬러 모두 리셋
+  applyLineColor('#ffffff');
+  applyBlurColor('#ffffff');
+  brandScaleFactor=1.0; brandOffsetY=0;
+  document.getElementById('brandScale').value=100;
+  document.getElementById('brandScaleVal').textContent='100%';
+  document.getElementById('brandPosY').value=0;
+  document.getElementById('brandPosYVal').textContent='0';
+  userBrandImg=null;
+  const bImg=document.getElementById('brandImg');
+  bImg.removeAttribute('src');bImg.style.display='none';
+  document.getElementById('brandArea').classList.remove('has-img');
+  document.getElementById('logoHist').innerHTML='';
+  for(let i=0;i<6;i++){
+    userPhotos[i]=null; userPhotoDimA[i]=0; userPhotoScale[i]=1;
+    userPhotoOffX[i]=0; userPhotoOffY[i]=0;
+    const slot=document.querySelector('.pslot[data-idx="'+i+'"]');
+    if(slot){const t=slot.querySelector('img');if(t)t.remove();slot.classList.remove('has-img','selected');}
+  }
+  userPhotoStripEl=null;
+  document.getElementById('photoCount').textContent='0';
+  closeDimPanel();
+  undoStack=[];
+  updateUndoBtn();
+  draw(parseFloat(document.getElementById('scrub').value));
+}
+
+document.getElementById('undoBtn').addEventListener('click',doUndo);
+document.getElementById('resetBtn').addEventListener('click',doReset);
+/* 키보드 단축키: Ctrl/Cmd + Z */
+document.addEventListener('keydown',function(e){
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!e.shiftKey){
+    const tag=(e.target.tagName||'').toLowerCase();
+    if(tag==='input'&&e.target.type==='text')return; // hex 입력 중엔 무시
+    e.preventDefault();
+    doUndo();
+  }
+});
+updateUndoBtn();
 
 
 
