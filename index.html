@@ -34,23 +34,6 @@ body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:#141414;co
 .etb-btn .etb-ico{font-size:13px;line-height:1}
 .etb-btn.reset:hover:not(:disabled){border-color:#8a3a3a;color:#ffb0b0}
 
-/* 1번 슬롯 가이드 툴팁 */
-.pslot.has-guide{position:relative}
-.pslot.has-guide:hover{overflow:visible}
-.slot-tip{
-  position:absolute;bottom:calc(100% + 8px);left:0;transform:translateY(4px);
-  width:200px;background:#23262c;border:1px solid #363a42;border-radius:7px;
-  padding:9px 11px;font-size:11px;line-height:1.55;color:#cfd3da;
-  box-shadow:0 6px 20px rgba(0,0,0,.55);
-  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s,transform .15s;z-index:200;
-}
-.slot-tip b{color:#fff;font-weight:600}
-.slot-tip::after{
-  content:"";position:absolute;top:100%;left:24px;
-  border:6px solid transparent;border-top-color:#23262c;
-}
-.pslot.has-guide:hover .slot-tip{opacity:1;visibility:visible;transform:translateY(0)}
-
 /* Color rows */
 .crow{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .clbl{font-size:12px;color:#d8d8d8;width:66px;flex-shrink:0}
@@ -417,6 +400,8 @@ const featherKeys=[{t:0.375,v:15},{t:1.5,v:40},{t:1.875,v:40},{t:2.583,v:12},{t:
 const slideKeys=[{t:2.125,x:0},{t:2.708,x:0},{t:3.25,x:0,ease:'io'},{t:3.583,x:-1},{t:4.292,x:-1,ease:'io'},{t:4.625,x:-2},{t:5.333,x:-2,ease:'io'},{t:5.667,x:-3},{t:6.375,x:-3,ease:'io'},{t:6.708,x:-4},{t:7.417,x:-4,ease:'io'},{t:7.75,x:-5}];
 const blurKeys={1:[{t:1.33,v:0},{t:2,v:15},{t:2.42,v:14},{t:2.83,v:0}],2:[{t:3.58,v:34},{t:3.83,v:0}],3:[{t:4.62,v:34},{t:4.88,v:0}],4:[{t:5.67,v:34},{t:5.92,v:0}],5:[{t:6.71,v:34},{t:6.96,v:0}],6:[{t:7.75,v:34},{t:8,v:0}]};
 const blurColorOpacity=[{t:2.5,v:0},{t:2.8,v:100},{t:8.57,v:100,ease:'ooo'},{t:9,v:0}];
+/* 인트로 구간(1번 사진) 전체 딤: 원 등장~2.2초 유지, 2.2~2.6초 원이 커지며 사라짐 */
+const introDimKeys=[{t:0.375,v:0.4},{t:2.2,v:0.4,ease:'iii'},{t:2.6,v:0}];
 const blurColorScale=[{t:2.2,v:.95},{t:2.6,v:1,ease:'iii'},{t:8.57,v:1,ease:'ooo'},{t:9,v:0}];
 const arrowOpacity=[{t:2.62,v:0},{t:2.67,v:100},{t:8.33,v:100},{t:8.38,v:0}];
 const gaugePos=[{t:3.375,x:742},{t:3.53,x:672},{t:3.61,x:692},{t:3.7,x:672},{t:3.8,x:682},{t:4.417,x:682},{t:4.572,x:613},{t:4.652,x:633},{t:4.742,x:613},{t:4.842,x:623},{t:5.458,x:623},{t:5.613,x:552},{t:5.693,x:572},{t:5.783,x:552},{t:5.883,x:562},{t:6.5,x:562},{t:6.655,x:493},{t:6.735,x:513},{t:6.825,x:493},{t:6.925,x:503},{t:7.542,x:503},{t:7.697,x:432},{t:7.777,x:452},{t:7.867,x:432},{t:7.967,x:442}];
@@ -544,6 +529,15 @@ function renderTo(g,scale,t){
       maskCtx.globalCompositeOperation='source-over';
     }
 
+    /* 인트로 전체 딤 (1번 사진 구간에만, 사진 영역 안쪽에 적용) */
+    const introDim=interp(introDimKeys,t);
+    if(introDim>0.001){
+      maskCtx.globalCompositeOperation='source-atop';
+      maskCtx.fillStyle=`rgba(0,0,0,${introDim})`;
+      maskCtx.fillRect(0,0,COMP_W,COMP_H);
+      maskCtx.globalCompositeOperation='source-over';
+    }
+
     g.drawImage(maskCv,0,0);
   }
 
@@ -649,15 +643,6 @@ function buildSlots(){
 
     const num=document.createElement('span');num.className='sn';num.textContent=i+1;
     slot.appendChild(num);
-
-    /* 1번 슬롯 가이드 툴팁 */
-    if(i===0){
-      slot.classList.add('has-guide');
-      const tip=document.createElement('div');
-      tip.className='slot-tip';
-      tip.innerHTML='<b>1번 사진 안내</b><br>영상 시작 시 텍스트가 사진 위에 올라가요. 비교적 톤이 어두운 사진을 선택해주세요.';
-      slot.appendChild(tip);
-    }
 
     /* delete btn */
     const del=document.createElement('div');del.className='del-btn';del.textContent='✕';
